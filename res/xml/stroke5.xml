@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
+	android:keyWidth="20%p"
+	android:horizontalGap="0px"
+	android:verticalGap="0px"> 
+
+	<Row android:rowEdgeFlags="bottom" >
+		<Key android:codes="110" android:keyIcon="@drawable/n_icon"
+			android:iconPreview="@drawable/n_preview"
+			android:keyEdgeFlags="left"/>
+		<Key android:codes="109" android:keyIcon="@drawable/m_icon"
+			android:iconPreview="@drawable/m_preview"/>
+
+		<Key android:codes="44" android:keyIcon="@drawable/comma_icon"
+			android:iconPreview="@drawable/comma_preview"/>
+		<Key android:codes="46" android:keyIcon="@drawable/period_icon"
+			android:iconPreview="@drawable/period_preview"/>
+		<Key android:codes="47" android:keyIcon="@drawable/slash_icon"
+			android:iconPreview="@drawable/slash_preview" android:keyEdgeFlags="right"/>
+	</Row>
+</Keyboard>
