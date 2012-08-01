@@ -26,11 +26,14 @@ import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.Keyboard.Key;
 
 import android.util.AttributeSet;
+import android.util.Log;
 
 public class Stroke5KeyboardView extends KeyboardView {
 
 	public Stroke5KeyboardView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		Log.d("Stroke5IME", "Stroke5KeyboardView->parent - width:"+this.getWidth());
+		Log.d("Stroke5IME", "Stroke5KeyboardView->parent - height:"+this.getHeight());
 	}
 
 	public Stroke5KeyboardView(Context context, AttributeSet attrs, int defStyle) {

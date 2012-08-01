@@ -19,37 +19,59 @@
 
 package com.avengergear.android.stroke5;
 
+import java.io.IOException;
+
 import android.content.Context;
+import android.database.SQLException;
 import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;  
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
 import android.view.View;
 import android.view.KeyEvent;
 import android.widget.TextView;
+import android.widget.ScrollView;
+import android.widget.HorizontalScrollView;
+import android.widget.FrameLayout;
 
 import android.util.Log;
 
 public class Stroke5 extends InputMethodService implements KeyboardView.OnKeyboardActionListener
 {
+	private FrameLayout		mFrameLayout;
+	//private ScrollView		mScrollView;
+	private HorizontalScrollView	mScrollView;
+	private CandidateViewContainer  mCandidateViewContainer;
+	private CandidateView           mCandidateView;
+	private InputConnection		mInputConnection;
+
 	private KeyboardContainer       mKeyboardContainer;
 	private KeyboardView            mStroke5KeyboardView;
 	private Stroke5Keyboard         mStroke5Keyboard;
+
+	private StringBuilder		mComposing = new StringBuilder();
+
+	private DatabaseHelper		mCharTable;
 
 
 	/* Override the onCreate, to build the setup */ 
 	@Override public void onCreate() {
 		super.onCreate();
-		Log.d("Stroke5IME", "onCreate");
+		Log.d("Stroke5IME", "Stroke5->onCreate");
+		mCharTable = new DatabaseHelper(this);
+		try {
+			mCharTable.createDatabase();
+		} catch (IOException e) {
+			throw new Error("Unable to create database :" + e);
+		}
+		 
+		try {
+			mCharTable.openDatabase();
+		}catch(SQLException e){
+			throw new Error("Unable to open database :" + e);
+		}
 	}
-
-	/**
-	 * InputMethodService Interface Started
-	 *
-	 * The following is InputMethod Abstract interface for call
-	 * back and option for implementation
-	 *
-	 **/
 
 	/**
 	 * Setting up the UI after onCreate and Configuration setup
@@ -61,7 +83,7 @@ public class Stroke5 extends InputMethodService implements KeyboardView.OnKeyboa
 	 **/
 	@Override public void onInitializeInterface() {
 		super.onInitializeInterface();
-		Log.d("Stroke5IME", "onInitializeInterface");
+		Log.d("Stroke5IME", "Stroke5->onInitializeInterface");
 		// create the acutal layout of the Stroke5 keyboard
 		mStroke5Keyboard = new Stroke5Keyboard(this, R.xml.stroke5);
 	} 
@@ -75,7 +97,7 @@ public class Stroke5 extends InputMethodService implements KeyboardView.OnKeyboa
 	 **/
 	@Override public void onBindInput() {
 		super.onBindInput();
-		Log.d("Stroke5IME", "onBindInput");
+		Log.d("Stroke5IME", "Stroke5->onBindInput");
 	}
 
 	/**
@@ -87,17 +109,17 @@ public class Stroke5 extends InputMethodService implements KeyboardView.OnKeyboa
 	 **/
 	@Override public void onStartInput(EditorInfo attribute, boolean restarting) {
 		super.onStartInput(attribute, restarting);
+		Log.d("Stroke5IME", "Stroke5->onStartInput.");
 	}
-
 	/**
 	 * Create the actual Stroke5 input view for the once the input
 	 * method being called or re-configure etc 
 	 *
 	 **/
 	@Override public View onCreateInputView() {
-		Log.d("Stroke5IME", "onCreateInputView.");
+		Log.d("Stroke5IME", "Stroke5->onCreateInputView.");
 		mKeyboardContainer = (KeyboardContainer) getLayoutInflater().inflate(R.layout.keyboard_container, null);
-		mStroke5KeyboardView = (KeyboardView) mKeyboardContainer.getChildAt(0);
+		mStroke5KeyboardView = (KeyboardView) mKeyboardContainer.getChildAt(1);
 		mStroke5KeyboardView.setOnKeyboardActionListener(this);
 		mStroke5KeyboardView.setKeyboard(mStroke5Keyboard);
 		return mKeyboardContainer;
@@ -111,9 +133,30 @@ public class Stroke5 extends InputMethodService implements KeyboardView.OnKeyboa
 	 *
 	 **/
 	@Override public View onCreateCandidatesView() {
-		Log.d("Stroke5IME", "onCreateCandidatesView.");
-		return super.onCreateCandidatesView();
+		Log.d("Stroke5IME", "Stroke5->onCreateCandidatesView.");
+		mFrameLayout= (FrameLayout) mKeyboardContainer.getChildAt(0);
+		Log.d("Stroke5IME", "Stroke5->onCreateCandidatesView->getFrameLayout");
+		mScrollView = (HorizontalScrollView) mFrameLayout.getChildAt(0); 
+		Log.d("Stroke5IME", "Stroke5->onCreateCandidatesView->getScrollView");
+		mCandidateViewContainer = (CandidateViewContainer) mScrollView.getChildAt(0);
+		Log.d("Stroke5IME", "Stroke5->onCreateCandidatesView->getCandidateViewContainer");
+		setCandidatesViewShown(false);
+		// we are not using the CandiatesView default Framelayout
+		mCandidateViewContainer.setInput(this); 
+		return null;
 	}
+	
+	@Override public void onStartInputView (EditorInfo info, boolean restarting) {
+		super.onStartInputView(info, restarting);
+		Log.d("Stroke5IME", "Stroke5->onStartInputView.");
+		// (info.inputType & EditorInfo.TYPE_CLASS_MASK)
+		//     TYPE_CLASS_NUMBER
+		//     TYPE_CLASS_DATETIME
+		//     TYPE_CLASS_PHONE
+		//     TYPE_CLASS_TEXT
+		//     TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_URI or TYPE_TEXT_FLAG_AUTO_COMPLETE
+	}
+
 
 	/**
 	 * Create UI for extractTextView 
@@ -126,7 +169,7 @@ public class Stroke5 extends InputMethodService implements KeyboardView.OnKeyboa
 	 *
 	 **/ 
 	@Override public View onCreateExtractTextView(){
-		Log.d("Stroke5IME", "onCreateExtractTextView.");
+		Log.d("Stroke5IME", "Stroke5->onCreateExtractTextView.");
 		return super.onCreateExtractTextView();
 	}
 
@@ -137,11 +180,110 @@ public class Stroke5 extends InputMethodService implements KeyboardView.OnKeyboa
 	 **/
 
 	public void onText(CharSequence text) {
+		Log.d("Stroke5IME", "Stroke5->onText");
+	}
+
+	public void commit(String input) { 
+		mInputConnection.commitText(input, 1); 
+		mComposing.delete(0, mComposing.length());
+	}
+
+	/**
+	 * Updating the candidate list base on the input from the soft key
+	 *
+	 * ToDo:
+	 * There are only 5 keys max, we can try to make more AI into word
+	 * combination in the future 
+	 *
+	 **/
+	private void updateCandidates() {
+		String candidates = null;
+		Log.d("Stroke5IME", "Stroke5->updateCandidates");
+		if( mComposing.length() > 0 ){
+			switch( mComposing.length() ){
+				case 1:
+					mCandidateViewContainer.setupSingleCharTable(mComposing.toString());
+					break;
+				case 2:
+					mCandidateViewContainer.setupTwoCharTable(mComposing.charAt(0),mComposing.charAt(1));
+					break;
+				case 3:
+					candidates = mCharTable.getCharList(
+						Character.toString(mComposing.charAt(0)),
+						Character.toString(mComposing.charAt(1)),
+						Character.toString(mComposing.charAt(2)));
+					Log.d("Stroke5IME", "Stroke5->updateCandidates->3" + candidates);
+					mCandidateViewContainer.createCandidatesButton(candidates); 
+					break;
+				case 4:
+					candidates = mCharTable.getCharList(
+						Character.toString(mComposing.charAt(0)),
+						Character.toString(mComposing.charAt(1)),
+						Character.toString(mComposing.charAt(2)),
+						Character.toString(mComposing.charAt(3)));
+					Log.d("Stroke5IME", "Stroke5->updateCandidates->4" + candidates);
+					mCandidateViewContainer.createCandidatesButton(candidates); 
+					break;
+				case 5:
+					candidates = mCharTable.getCharList(
+						Character.toString(mComposing.charAt(0)),
+						Character.toString(mComposing.charAt(1)),
+						Character.toString(mComposing.charAt(2)),
+						Character.toString(mComposing.charAt(3)),
+						Character.toString(mComposing.charAt(4)));
+					Log.d("Stroke5IME", "Stroke5->updateCandidates->5" + candidates);
+					mCandidateViewContainer.createCandidatesButton(candidates); 
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
+	/**
+	 * Backspace is being handle in both text and composing text
+	 **/
+	private void backspace() {
+		Log.d("Stroke5IME", "Stroke5->backspace");
+		if( mComposing.length() > 0 ) { 
+			mComposing.deleteCharAt(mComposing.length()-1); 
+			mInputConnection.setComposingText(mComposing, mComposing.length());
+		} else { 
+			mInputConnection.deleteSurroundingText(1,0);
+		}
 	}
 
 	/* Handle the onKey from the virtual keyboard. */
 
 	@Override public void onKey(int primaryCode, int[] keyCodes) {
+		Log.d("Stroke5IME", "onKey - KeyCode ="+primaryCode +" "+ keyCodes[0] );
+		mInputConnection = getCurrentInputConnection();
+		switch( primaryCode ){
+			case KeyEvent.KEYCODE_N:
+			case 110:
+			case KeyEvent.KEYCODE_M:
+			case 109:
+			case KeyEvent.KEYCODE_COMMA:
+			case 44:
+			case KeyEvent.KEYCODE_PERIOD:
+			case 46:
+			case KeyEvent.KEYCODE_SLASH:
+			case 47:
+				Log.d("Stroke5IME", "onKey -- "+primaryCode );
+				Log.d("Stroke5IME", "onKey key before "+ mInputConnection.getTextBeforeCursor(1,0));
+				mComposing.append((char) primaryCode);
+				mInputConnection.setComposingText(mComposing, mComposing.length() );
+				Log.d("Stroke5IME", "onKey key "+ mComposing +mComposing.length() );
+				break;
+			case -1:
+				backspace(); 
+				break;
+			default:
+				Log.d("Stroke5IME", "onKey -- other key? "+primaryCode );
+				mComposing.append((char) primaryCode);
+				break;
+		}
+		updateCandidates();
 	}
 
 	/* Override the default hard key press from physical keyboard */

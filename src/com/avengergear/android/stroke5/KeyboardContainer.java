@@ -25,14 +25,22 @@ import android.content.res.XmlResourceParser;
 
 import android.util.AttributeSet;
 
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import android.util.Log;
 
 
-public class KeyboardContainer extends RelativeLayout {
+
+public class KeyboardContainer extends LinearLayout {
 
 	public KeyboardContainer(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		Log.d("Stroke5IME", "KeyboardContainer->init");
+		Log.d("Stroke5IME", "KeyboardContainer->parent - width:"+this.getWidth());
+		Log.d("Stroke5IME", "KeyboardContainer->parent - height:"+this.getHeight());
+		Log.d("Stroke5IME", "KeyboardContainer->parent - width:"+this.getMeasuredWidth());
+		Log.d("Stroke5IME", "KeyboardContainer->parent - height:"+this.getMeasuredHeight());
 	} 
 
 }

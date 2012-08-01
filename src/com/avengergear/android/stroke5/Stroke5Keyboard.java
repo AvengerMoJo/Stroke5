@@ -31,25 +31,27 @@ public class Stroke5Keyboard extends Keyboard {
 
 	public Stroke5Keyboard(Context context, int xmlLayoutResId) {
 		super(context, xmlLayoutResId);
-		Log.d("Stroke5IME", "Stroke5Keyboard");
+		Log.d("Stroke5IME", "Stroke5Keyboard->init");
 	} 
 
 	public Stroke5Keyboard(Context context, int layoutTemplateResId,
 		CharSequence characters, int columns, int horizontalPadding) {
 		super(context, layoutTemplateResId, characters, columns, horizontalPadding);
-		Log.d("Stroke5IME", "Stroke5Keyboard - context");
+		Log.d("Stroke5IME", "Stroke5Keyboard->init - Context");
 	}
 
 
 	static class Stroke5Key extends Keyboard.Key {
 		public Stroke5Key(Resources res, Keyboard.Row parent, int x, int y, XmlResourceParser parser) {
 			super(res, parent, x, y, parser);
+			Log.d("Stroke5IME", "Stroke5Key->init - Resource");
 		}
 		/**
 		 * Overriding this method so that we can reduce the target area for the key that
 		 * closes the keyboard. 
 		 **/
 		@Override public boolean isInside(int x, int y) {
+			Log.d("Stroke5IME", "Stroke5Key->isInside");
 			return super.isInside(x, codes[0] == KEYCODE_CANCEL ? y - 10 : y);
 		}
 	}
