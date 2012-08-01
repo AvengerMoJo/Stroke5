@@ -17,19 +17,49 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-	android:orientation="horizontal"
-	android:orientation="vertical"
+<LinearLayout
+</LinearLayout>
 -->
 <com.avengergear.android.stroke5.KeyboardContainer
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="wrap_content"
-	android:layout_height="wrap_content">
+	android:layout_height="wrap_content"
+	android:layout_width="fill_parent"
+	android:layout_alignParentBottom="true"
+	android:orientation="vertical"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<FrameLayout
+		android:orientation="horizontal"
+		android:background="#ff121212"
+		android:gravity="top"
+		android:layout_height="fill_parent"
+		android:layout_width="fill_parent"
+		android:scrollbarAlwaysDrawVerticalTrack="true"
+		xmlns:android="http://schemas.android.com/apk/res/android">
+		<HorizontalScrollView
+			android:layout_height="100dp"
+			android:layout_width="fill_parent"
+			android:scrollbarAlwaysDrawHorizontalTrack="true"
+			android:scrollbarStyle="insideOverlay"
+			android:scrollbars="vertical"
+			android:scrollbarSize="32dp"
+			android:fillViewport="true"
+			xmlns:android="http://schemas.android.com/apk/res/android">
+			<com.avengergear.android.stroke5.CandidateViewContainer
+				android:id="@+id/candidate_view_container"
+				android:orientation="vertical"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:padding="1dp"
+				xmlns:android="http://schemas.android.com/apk/res/android">
+			</com.avengergear.android.stroke5.CandidateViewContainer>
+		</HorizontalScrollView>
+	</FrameLayout>
 	<com.avengergear.android.stroke5.Stroke5KeyboardView
-		xmlns:android="http://schemas.android.com/apk/res/android"
 		android:id="@+id/stroke5keyboardview"
-		android:keyPreviewHeight="110px"
+		android:keyPreviewHeight="110dp"
 		android:layout_alignParentBottom="true"
 		android:layout_height="wrap_content"
-		android:layout_width="fill_parent">
+		android:layout_width="fill_parent"
+		android:layout_weight="1"
+		xmlns:android="http://schemas.android.com/apk/res/android">
 	</com.avengergear.android.stroke5.Stroke5KeyboardView>
 </com.avengergear.android.stroke5.KeyboardContainer>
