@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" 
 	package="com.avengergear.android.stroke5">
+        <uses-sdk android:minSdkVersion="4" />
 	<application android:label="@string/input_method_name">
 		<service android:name="Stroke5"
 			android:permission="android.permission.BIND_INPUT_METHOD">
