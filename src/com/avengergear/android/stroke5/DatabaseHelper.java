@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
+import java.io.File;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -47,7 +48,7 @@ import android.util.Log;
 public class DatabaseHelper extends SQLiteOpenHelper { 
 
 	private static String DataPath = "/data/data/com.avengergear.android.stroke5/databases/";
-	private static String DataFile = null;
+	private String DataFile = null;
 	private static String TableName= "char_table";
 	 
 	private SQLiteDatabase mCharTable;
@@ -56,7 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	public DatabaseHelper(Context context, String dbname) {
 		super(context, dbname, null, 1);
-		this.DataFile = dbname;
+		this.DataFile = new String(dbname);
 		this.mContext = context;
 	} 
 
@@ -75,17 +76,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	private boolean checkDatabase(){
-		SQLiteDatabase checkDB = null;
-		try{
-			checkDB = SQLiteDatabase.openDatabase(DataPath+DataFile, null, SQLiteDatabase.OPEN_READONLY);
-		}catch(SQLiteException e){
-			//database does't exist yet.
-		}
-		if(checkDB != null){
-			checkDB.close();
-			return true;
-		}
-		return false;
+		File dbFile = new File(DataPath + DataFile);
+		return dbFile.exists();
 	} 
 
 	private void copyDatabase() throws IOException{ 
