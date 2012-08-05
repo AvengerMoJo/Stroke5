@@ -52,22 +52,38 @@ public class Stroke5 extends InputMethodService implements KeyboardView.OnKeyboa
 
 	private StringBuilder		mComposing = new StringBuilder();
 
-	private DatabaseHelper		mCharTable;
+	private DatabaseHelper		mCommaCharTable;
+	private DatabaseHelper		mDotCharTable;
+	private DatabaseHelper		mMCharTable;
+	private DatabaseHelper		mNCharTable;
+	private DatabaseHelper		mSlashCharTable;
 
 
 	/* Override the onCreate, to build the setup */ 
 	@Override public void onCreate() {
 		super.onCreate();
 		Log.d("Stroke5IME", "Stroke5->onCreate");
-		mCharTable = new DatabaseHelper(this);
+		mCommaCharTable = new DatabaseHelper(this, "comma_char_table");
+		mDotCharTable = new DatabaseHelper(this, "dot_char_table");
+		mMCharTable = new DatabaseHelper(this, "m_char_table");
+		mNCharTable = new DatabaseHelper(this, "n_char_table");
+		mSlashCharTable = new DatabaseHelper(this, "slash_char_table");
 		try {
-			mCharTable.createDatabase();
+			mCommaCharTable.createDatabase();
+			mDotCharTable.createDatabase();
+			mMCharTable.createDatabase();
+			mNCharTable.createDatabase();
+			mSlashCharTable.createDatabase();
 		} catch (IOException e) {
 			throw new Error("Unable to create database :" + e);
 		}
 		 
 		try {
-			mCharTable.openDatabase();
+			mCommaCharTable.openDatabase();
+			mDotCharTable.openDatabase();
+			mMCharTable.openDatabase();
+			mNCharTable.openDatabase();
+			mSlashCharTable.openDatabase();
 		}catch(SQLException e){
 			throw new Error("Unable to open database :" + e);
 		}
@@ -197,9 +213,27 @@ public class Stroke5 extends InputMethodService implements KeyboardView.OnKeyboa
 	 *
 	 **/
 	private void updateCandidates() {
+		DatabaseHelper tempTable = null;
 		String candidates = null;
 		Log.d("Stroke5IME", "Stroke5->updateCandidates");
 		if( mComposing.length() > 0 ){
+			switch(mComposing.charAt(0)){
+				case ',':
+					tempTable = mCommaCharTable;
+					break;
+				case '.':
+					tempTable = mDotCharTable; 
+					break;
+				case 'm':
+					tempTable = mMCharTable; 
+					break;
+				case 'n':
+					tempTable = mNCharTable; 
+					break;
+				case '/':
+					tempTable = mSlashCharTable; 
+					break;
+			}
 			switch( mComposing.length() ){
 				case 1:
 					mCandidateViewContainer.setupSingleCharTable(mComposing.toString());
@@ -208,7 +242,7 @@ public class Stroke5 extends InputMethodService implements KeyboardView.OnKeyboa
 					mCandidateViewContainer.setupTwoCharTable(mComposing.charAt(0),mComposing.charAt(1));
 					break;
 				case 3:
-					candidates = mCharTable.getCharList(
+					candidates = tempTable.getCharList(
 						Character.toString(mComposing.charAt(0)),
 						Character.toString(mComposing.charAt(1)),
 						Character.toString(mComposing.charAt(2)));
@@ -216,7 +250,7 @@ public class Stroke5 extends InputMethodService implements KeyboardView.OnKeyboa
 					mCandidateViewContainer.createCandidatesButton(candidates); 
 					break;
 				case 4:
-					candidates = mCharTable.getCharList(
+					candidates = tempTable.getCharList(
 						Character.toString(mComposing.charAt(0)),
 						Character.toString(mComposing.charAt(1)),
 						Character.toString(mComposing.charAt(2)),
@@ -225,7 +259,7 @@ public class Stroke5 extends InputMethodService implements KeyboardView.OnKeyboa
 					mCandidateViewContainer.createCandidatesButton(candidates); 
 					break;
 				case 5:
-					candidates = mCharTable.getCharList(
+					candidates = tempTable.getCharList(
 						Character.toString(mComposing.charAt(0)),
 						Character.toString(mComposing.charAt(1)),
 						Character.toString(mComposing.charAt(2)),
