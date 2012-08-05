@@ -47,15 +47,16 @@ import android.util.Log;
 public class DatabaseHelper extends SQLiteOpenHelper { 
 
 	private static String DataPath = "/data/data/com.avengergear.android.stroke5/databases/";
-	private static String DataFile = "preload_stroke5_table";
+	private static String DataFile = null;
 	private static String TableName= "char_table";
 	 
 	private SQLiteDatabase mCharTable;
 	 
 	private final Context mContext;
 
-	public DatabaseHelper(Context context) {
-		super(context, DataFile, null, 1);
+	public DatabaseHelper(Context context, String dbname) {
+		super(context, dbname, null, 1);
+		this.DataFile = dbname;
 		this.mContext = context;
 	} 
 
