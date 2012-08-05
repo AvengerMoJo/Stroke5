@@ -219,18 +219,23 @@ public class Stroke5 extends InputMethodService implements KeyboardView.OnKeyboa
 		if( mComposing.length() > 0 ){
 			switch(mComposing.charAt(0)){
 				case ',':
+					Log.d("Stroke5IME", "Stroke5->updateCandidates->comma db");
 					tempTable = mCommaCharTable;
 					break;
 				case '.':
+					Log.d("Stroke5IME", "Stroke5->updateCandidates->dot db");
 					tempTable = mDotCharTable; 
 					break;
 				case 'm':
+					Log.d("Stroke5IME", "Stroke5->updateCandidates->m db");
 					tempTable = mMCharTable; 
 					break;
 				case 'n':
+					Log.d("Stroke5IME", "Stroke5->updateCandidates->n db");
 					tempTable = mNCharTable; 
 					break;
 				case '/':
+					Log.d("Stroke5IME", "Stroke5->updateCandidates->slash db");
 					tempTable = mSlashCharTable; 
 					break;
 			}
